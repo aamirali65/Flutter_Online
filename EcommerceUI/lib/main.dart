@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:testing/product_detail.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,9 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: const Color(0xFFF7F7F7),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF5B5FEF),
-        ),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF5B5FEF)),
       ),
       home: const HomePage(),
     );
@@ -34,44 +36,26 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int selectedIndex = 0;
 
-  final List<Map<String, dynamic>> products = [
-    {
-      'name': 'Wireless Headphones',
-      'price': '\$49.99',
-      'image':
-      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800',
-    },
-    {
-      'name': 'Smart Watch',
-      'price': '\$79.99',
-      'image':
-      'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800',
-    },
-    {
-      'name': 'Running Shoes',
-      'price': '\$64.99',
-      'image':
-      'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800',
-    },
-    {
-      'name': 'Backpack',
-      'price': '\$39.99',
-      'image':
-      'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800',
-    },
-    {
-      'name': 'Sunglasses',
-      'price': '\$29.99',
-      'image':
-      'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800',
-    },
-    {
-      'name': 'Sneakers',
-      'price': '\$59.99',
-      'image':
-      'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800',
-    },
-  ];
+  //array variable where api data store
+  List products = [];
+
+  //api function
+  void fetchProduct() async {
+    final response = await http.get(
+      Uri.parse("https://fakestoreapi.com/products/"),
+    );
+
+    setState(() {
+      products = jsonDecode(response.body);
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchProduct();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,10 +81,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(
-              Icons.search_rounded,
-              color: Colors.black87,
-            ),
+            icon: const Icon(Icons.search_rounded, color: Colors.black87),
           ),
 
           IconButton(
@@ -131,7 +112,6 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 // POPULAR PRODUCTS HEADER
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -144,9 +124,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
 
-                   Icon(
-                     Icons.grid_view_rounded
-                   )
+                    Icon(Icons.grid_view_rounded),
                   ],
                 ),
 
@@ -159,8 +137,7 @@ class _HomePageState extends State<HomePage> {
 
                   itemCount: products.length,
 
-                  gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 14,
@@ -188,22 +165,19 @@ class _HomePageState extends State<HomePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-
                           // PRODUCT IMAGE
                           Expanded(
                             child: Image.network(
                               product['image'],
                               width: double.infinity,
-                              fit: BoxFit.cover,
+                              fit: BoxFit.contain,
 
-                              errorBuilder:
-                                  (context, error, stackTrace) {
+                              errorBuilder: (context, error, stackTrace) {
                                 return Container(
                                   color: Colors.grey.shade100,
                                   child: const Center(
                                     child: Icon(
-                                      Icons
-                                          .image_not_supported_outlined,
+                                      Icons.image_not_supported_outlined,
                                       size: 40,
                                     ),
                                   ),
@@ -214,22 +188,15 @@ class _HomePageState extends State<HomePage> {
 
                           // PRODUCT DETAILS
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(
-                              12,
-                              11,
-                              10,
-                              12,
-                            ),
+                            padding: const EdgeInsets.fromLTRB(12, 11, 10, 12),
 
                             child: Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
 
                               children: [
-
                                 // NAME
                                 Text(
-                                  product['name'],
+                                  product['title'],
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
 
@@ -244,13 +211,13 @@ class _HomePageState extends State<HomePage> {
                                 // PRICE + BUY BUTTON
                                 Row(
                                   children: [
-
                                     Expanded(
                                       child: Text(
-                                        product['price'],
+                                        "Rs ${product['price']}",
                                         style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w800,
+                                          color: Colors.deepOrange,
                                         ),
                                       ),
                                     ),
@@ -259,33 +226,40 @@ class _HomePageState extends State<HomePage> {
                                       height: 34,
 
                                       child: ElevatedButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ProductDetailPage(productsDetail: product,),
+                                            ),
+                                          );
+                                        },
 
-                                        style:
-                                        ElevatedButton.styleFrom(
+                                        style: ElevatedButton.styleFrom(
                                           elevation: 0,
 
-                                          padding:
-                                          const EdgeInsets
-                                              .symmetric(
+                                          backgroundColor: Colors.deepOrange,
+
+                                          foregroundColor: Colors.white,
+
+                                          padding: const EdgeInsets.symmetric(
                                             horizontal: 12,
                                           ),
 
-                                          shape:
-                                          RoundedRectangleBorder(
-                                            borderRadius:
-                                            BorderRadius.circular(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
                                               10,
                                             ),
                                           ),
                                         ),
 
                                         child: const Text(
-                                          'Buy',
+                                          'View',
                                           style: TextStyle(
                                             fontSize: 12,
-                                            fontWeight:
-                                            FontWeight.w700,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.white,
                                           ),
                                         ),
                                       ),
@@ -311,10 +285,7 @@ class _HomePageState extends State<HomePage> {
         height: 72,
         backgroundColor: Colors.white,
 
-        indicatorColor: Theme.of(context)
-            .colorScheme
-            .primary
-            .withOpacity(0.12),
+        indicatorColor: Theme.of(context).colorScheme.primary.withOpacity(0.12),
 
         selectedIndex: selectedIndex,
 
