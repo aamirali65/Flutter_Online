@@ -1,7 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:testing/pages/auth/login/index.dart';
 
-class SettingPage extends StatelessWidget {
+class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
+
+  @override
+  State<SettingPage> createState() => _SettingPageState();
+}
+
+class _SettingPageState extends State<SettingPage> {
+
+  void logout()async{
+    final session = await SharedPreferences.getInstance();
+    await session.setBool('checkLogin', false);
+
+    if(!mounted) return;
+
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>LoginScreen()));
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -62,13 +80,16 @@ class SettingPage extends StatelessWidget {
                   trailing: Icon(Icons.chevron_right),
                 ),
                 SizedBox(height: 20,),
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 15,horizontal: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.deepOrange
-                  ),
-                  child: Center(
-                    child: Text("Log Out",style: TextStyle(color: Colors.white,fontSize: 20),),
+                GestureDetector(
+                  onTap: logout,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 15,horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.deepOrange
+                    ),
+                    child: Center(
+                      child: Text("Log Out",style: TextStyle(color: Colors.white,fontSize: 20),),
+                    ),
                   ),
                 )
               ],

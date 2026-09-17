@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:testing/pages/cart/index.dart';
 import 'package:testing/pages/home/index.dart';
+import 'package:testing/pages/serach/index.dart';
 import 'package:testing/pages/setting/index.dart';
-import 'package:testing/product_detail.dart';
-import 'package:testing/todayclass.dart';
+import 'package:testing/pages/splash/index.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFFF7F7F7),
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF5B5FEF)),
       ),
-      home: HomePage()
+      home: SplashScreen()
     );
   }
 }
@@ -69,7 +69,9 @@ class _HomePageState extends State<HomePage> {
 
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>SearchPage()));
+            },
             icon: const Icon(Icons.search_rounded, color: Colors.black87),
           ),
 
